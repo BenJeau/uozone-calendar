@@ -15,7 +15,7 @@ Once its done downloading/installing, for now, you'll need to write your uoZone 
 ```
 node .
 ```
-Once the code is finished, the data will be located at the root of the folder in the file named _data.json_. The data's JSON schema file in the file named [jsonSchema.json](https://github.com/BenJeau/uozoneCalendar/blob/master/jsonSchema.json) and you can visualise the file with [_docson_](https://www.npmjs.com/package/docson) on the webpage [here]().
+Once the code is finished, the data will be located at the root of the folder in the file named _data.json_. The data's JSON schema file in the file named [jsonSchema.json](https://github.com/BenJeau/uozoneCalendar/blob/master/jsonSchema.json) and you can visualise the file with [_docson_](https://www.npmjs.com/package/docson) on the webpage [here](http://lbovet.github.io/docson/index.html#https://raw.githubusercontent.com/BenJeau/uozoneCalendar/master/jsonSchema.json).
 
 ## Steps the program takes
 1. Logs in to [uoZone's website](https://uozone2.uottawa.ca/)
