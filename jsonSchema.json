@@ -4,7 +4,7 @@
     "description": "Information about the course schedule of a course in uoZone",
     "type": "array",
     "items": {
-        "$ref": "courseSchedule.json#/definitions/Term"
+        "$ref": "jsonSchema.json#/definitions/Term"
     },
     "definitions": {
         "Term": {
@@ -26,7 +26,7 @@
                 "courses": {
                     "type": "array",
                     "items": {
-                        "$ref": "courseSchedule.json#/definitions/Course"
+                        "$ref": "jsonSchema.json#/definitions/Course"
                     }
                 }
             },
@@ -67,7 +67,7 @@
                 "classes": {
                     "type": "array",
                     "items": {
-                        "$ref": "courseSchedule.json#/definitions/Class"
+                        "$ref": "jsonSchema.json#/definitions/Class"
                     }
                 }
             },
