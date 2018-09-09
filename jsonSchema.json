@@ -1,0 +1,147 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Course Schedule",
+    "description": "Information about the course schedule of a course in uoZone",
+    "type": "array",
+    "items": {
+        "$ref": "courseSchedule.json#/definitions/Term"
+    },
+    "definitions": {
+        "Term": {
+            "type": "object",
+            "description": "Information about the term, in regards to a schedule",
+            "properties": {
+                "level": {
+                    "description": "The level of studies, which is either undergraduate or graduate",
+                    "type": "string"
+                },
+                "trimester": {
+                    "description": "The academic term, which is either fall, winter, or spring/summer",
+                    "type": "string"
+                },
+                "year": {
+                    "description": "The year of the academic term",
+                    "type": "string"
+                },
+                "courses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "courseSchedule.json#/definitions/Course"
+                    }
+                }
+            },
+            "required": [
+                "level",
+                "trimester",
+                "year"
+            ]
+        },
+        "Course": {
+            "type": "object",
+            "description": "Information about the course",
+            "properties": {
+                "name": {
+                    "description": "The name of the course",
+                    "type": "string"
+                },
+                "code": {
+                    "description": "The code of the course, the first three characters define the type of the course and the four last number is the number of the course",
+                    "type": "string"
+                },
+                "grading": {
+                    "description": "The level/type of the course, e.g. first year courses",
+                    "type": "string"
+                },
+                "grade": {
+                    "description": "The grade the person got in the course",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "The status of enrolment in the course",
+                    "type": "string"
+                },
+                "units": {
+                    "description": "...",
+                    "type": "string"
+                },
+                "classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "courseSchedule.json#/definitions/Class"
+                    }
+                }
+            },
+            "required": [
+                "classes",
+                "code",
+                "status",
+                "units",
+                "grading",
+                "name"
+            ]
+        },
+        "Class": {
+            "type": "object",
+            "description": "Information about the classes that are in the course",
+            "properties": {
+                "classNumber": {
+                    "description": "The identification number of the class",
+                    "type": "string"
+                },
+                "section": {
+                    "description": "",
+                    "type": "string"
+                },
+                "address": {
+                    "description": "The address of the building where the class is going to be",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Specifies whether its a lecture, a tutorial, or a laboratory",
+                    "type": "string"
+                },
+                "weekday": {
+                    "description": "The day of the week the class will take place",
+                    "type": "string"
+                },
+                "building": {
+                    "description": "The three letter acronym of the name of the building",
+                    "type": "string"
+                },
+                "room": {
+                    "description": "The room number of the class",
+                    "type": "string"
+                },
+                "instructor": {
+                    "description": "The name of the person teaching the class",
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "The time in which the class starts",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "The time in which the class ends",
+                    "type": "string"
+                },
+                "startDate": {
+                    "description": "The date that the class starts",
+                    "type": "string"
+                },
+                "endDate": {
+                    "description": "The date that the class ends",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "address",
+                "classNumber",
+                "startDate",
+                "endDate",
+                "instructor",
+                "type",
+                "section"
+            ]
+        }
+    }
+}
