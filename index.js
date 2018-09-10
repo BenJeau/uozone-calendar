@@ -1,10 +1,20 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const esformatter = require('esformatter');
+const readline = require('readline');
+var Writable = require('stream').Writable;
+
+var mutableStdout = new Writable({
+  write: function(chunk, encoding, callback) {
+    if (!this.muted)
+      process.stdout.write(chunk, encoding);
+    callback();
+  }
+});
 
 const filename = "data.json";
-const USERNAME = "";
-const PASSWORD = "";
+let USERNAME = "";
+let PASSWORD = "";
 const LINKS = {
     home: "https://uozone2.uottawa.ca/",
     beforeExtraction: "https://www.uocampus.uottawa.ca/psp/csprpr9www/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_LIST.GBL?languageCd=ENG",
@@ -15,43 +25,11 @@ let page;
 let browser;
 
 async function asyncMain() {
-    browser = await puppeteer.launch({ headless: true });
-    page = await browser.newPage();
-
-    // Does not load images on the webpage (speeds up load times)
-    await page.setRequestInterception(true);
-    await page.on('request', request => {
-        if (request.resourceType() === 'image')
-            request.abort();
-        else
-            request.continue();
-    });
-
-    // Prints everything from the broswer console in the terminal and removes the errors from not loading images
-    await page.on('console', msg => {
-        if (msg.text().trim() !== "Failed to load resource: net::ERR_FAILED") {
-            console.log('PAGE LOG:', msg.text())
-        }
-    });
-
-    // Goes to uoZone's website
-    console.log("----- LOADING HOME")
-    await page.goto(LINKS.home);
-
-    // Logs in to uoZone --- Potential issue: to go to the next step, its time based
-    console.log("----- LOGING IN");
-    await uozoneLogIn();
-    await sleep(2000);
-
-    // Goes to the website with the course information
-    console.log("----- LOADING MAIN WEBSITE - TO HAVE ACCESS")
-    await page.goto(LINKS.beforeExtraction);
-
     // Extracts information
     console.log("----- EXTRACTING INFORMATION")
     await page.goto(LINKS.extraction);
-    await preliminarySteps(); 
-    await navigateUozone();   
+    await preliminarySteps();
+    await navigateUozone();
 }
 
 async function preliminarySteps() {
@@ -62,12 +40,13 @@ async function preliminarySteps() {
     await page.exposeFunction("finished", async data => {
         console.log("----- COURSE INFO");
         console.log("----- SAVING THE DATA IN THE FILE NAMED: " + __dirname + "\\" + filename);
-        fs.writeFile(filename, esformatter.format(data) , (err) => {
+        fs.writeFile(filename, esformatter.format(data), (err) => {
             if (err) throw err;
         });
         console.log("----- LOGING OUT");
         await page.goto(LINKS.home + "/user/logout");
         browser.close();
+        console.log("----- BROWSER CLOSED")
     });
     await page.evaluate(() => {
         let id = 0;
@@ -261,4 +240,74 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-asyncMain();
+function getCredentials() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: mutableStdout,
+        terminal: true
+    });
+    
+    rl.question('Enter your uoZone\'s username > ', (answer) => {
+        USERNAME = answer;
+        process.stdout.write('Enter you uoZone\'s password > ');
+        mutableStdout.muted = true;
+        rl.question('', (answer) => {
+            PASSWORD = answer;
+            
+            mutableStdout.muted = false;
+            rl.close();
+            process.stdout.write('\033c');
+            verifyCredentials();
+        });
+    });
+}
+
+async function verifyCredentials() {
+    // Goes to uoZone's website
+    await page.goto(LINKS.home);
+
+    // Logs in to uoZone --- Potential issue: to go to the next step, its time based
+    await uozoneLogIn();
+    await sleep(2000);
+    
+    // Goes to the website with the course information to see if you succesfully loged in
+    await page.goto(LINKS.beforeExtraction);
+
+    // Checks if the page's title is equal to "my class schedule" to know if the user has successfully loged in
+    if (await page.evaluate(() => {return document.title.toLowerCase().trim()}) === "my class schedule") {
+        console.log("Your credentials are valid\n");
+        asyncMain()
+    } else {
+        console.log("Your credentials are not valid");
+        getCredentials();
+    }
+}
+
+async function broswerSetup() {
+    // Opens a browser in the background and opens a new tab
+    browser = await puppeteer.launch({ headless: true });
+    page = await browser.newPage();
+
+    // Does not load images on the webpage (speeds up load times)
+    await page.setRequestInterception(true);
+    await page.on('request', request => {
+        if (request.resourceType() === 'image')
+            request.abort();
+        else
+            request.continue();
+    });
+
+    // Prints everything from the broswer console in the terminal and removes the errors from not loading images
+    await page.on('console', msg => {
+        if (msg.text().trim() !== "Failed to load resource: net::ERR_FAILED") {
+            console.log('PAGE LOG:', msg.text())
+        }
+    });
+}
+
+async function main() {
+    await broswerSetup();
+    getCredentials();
+}
+
+main();
